@@ -1,0 +1,2 @@
+For some reason, when building OIS as a static lib, the dxguid.lib and dinput8.lib libraries are not included in the additional dependencies in the generated projects, even though they are listed in the CMake scripts.
+Because of this, after generating the projects, before building the lib. Make sure the two above libraries are included in Librarian -> General for all configurations, in Visual Studio.
