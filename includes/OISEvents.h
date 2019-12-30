@@ -35,7 +35,7 @@ namespace OIS
 	class _OISExport EventArg
 	{
 	public:
-		explicit EventArg(Object* obj) :
+		explicit EventArg(const Object* obj) :
 		 device(obj) {}
 		virtual ~EventArg() {}
 

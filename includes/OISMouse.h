@@ -89,7 +89,7 @@ namespace OIS
 	class _OISExport MouseEvent : public EventArg
 	{
 	public:
-		MouseEvent(Object* obj, const MouseState& ms) :
+		MouseEvent(const Object* obj, const MouseState& ms) :
 		 EventArg(obj), state(ms) {}
 		virtual ~MouseEvent() {}
 

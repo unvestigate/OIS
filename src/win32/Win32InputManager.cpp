@@ -45,6 +45,8 @@ Win32InputManager::Win32InputManager() :
 	joySticks	= 0;
 	keyboardUsed = mouseUsed = false;
 
+	mSkipCoopLevels = false;
+
 	//Setup our internal factories
 	mFactories.push_back(this);
 }
@@ -78,6 +80,13 @@ void Win32InputManager::_initialize(ParamList& paramList)
 		OIS_EXCEPT(E_General, "Win32InputManager::Win32InputManager >> The sent HWND is not valid!");
 
 	hInst = GetModuleHandle(nullptr);
+
+	// Added for Basis. Allow skipping the co-op levels by setting the SKIP_COOP_LEVELS parameter to true.
+	ParamList::iterator skipCoopLevelIt = paramList.find("SKIP_COOP_LEVELS");
+	if (skipCoopLevelIt != paramList.end())
+	{
+		mSkipCoopLevels = skipCoopLevelIt->second == "true";
+	}
 
 	//Create the device
 	hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&mDirectInput, nullptr);
@@ -238,13 +247,13 @@ Object* Win32InputManager::createObject(InputManager* creator, Type iType, bool 
 		case OISKeyboard:
 		{
 			if(!keyboardUsed)
-				obj = new Win32Keyboard(this, mDirectInput, bufferMode, kbSettings);
+				obj = new Win32Keyboard(this, mDirectInput, bufferMode, kbSettings, mSkipCoopLevels);
 			break;
 		}
 		case OISMouse:
 		{
 			if(!mouseUsed)
-				obj = new Win32Mouse(this, mDirectInput, bufferMode, mouseSettings);
+				obj = new Win32Mouse(this, mDirectInput, bufferMode, mouseSettings, mSkipCoopLevels);
 			break;
 		}
 		case OISJoyStick:

@@ -120,7 +120,7 @@ namespace OIS
 	class _OISExport JoyStickEvent : public EventArg
 	{
 	public:
-		JoyStickEvent(Object* obj, const JoyStickState& st) :
+		JoyStickEvent(const Object* obj, const JoyStickState& st) :
 		 EventArg(obj), state(st) {}
 		virtual ~JoyStickEvent() {}
 

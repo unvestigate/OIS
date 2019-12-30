@@ -34,7 +34,7 @@ namespace OIS
 	class Win32Mouse : public Mouse
 	{
 	public:
-		Win32Mouse(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings);
+		Win32Mouse(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings, bool skipCoopLevels);
 		virtual ~Win32Mouse();
 
 		/** @copydoc Object::setBuffered */
@@ -60,6 +60,9 @@ namespace OIS
 		IDirectInputDevice8* mMouse;
 		DWORD coopSetting;
 		HWND mHwnd;
+
+		//! Added for Basis. Allows the user to skip setting coop levels for this device.
+		bool mSkipCoopLevels;
 	};
 }
 

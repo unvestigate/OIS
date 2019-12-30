@@ -31,13 +31,14 @@ following restrictions:
 using namespace OIS;
 
 //--------------------------------------------------------------------------------------------------//
-Win32Mouse::Win32Mouse(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings) :
+Win32Mouse::Win32Mouse(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings, bool skipCoopLevels) :
  Mouse(creator->inputSystemName(), buffered, 0, creator)
 {
 	mMouse		 = nullptr;
 	mDirectInput = pDI;
 	coopSetting  = coopSettings;
 	mHwnd		 = nullptr;
+	mSkipCoopLevels = skipCoopLevels;
 
 	static_cast<Win32InputManager*>(mCreator)->_setMouseUsed(true);
 }
@@ -64,8 +65,11 @@ void Win32Mouse::_initialize()
 
 	mHwnd = static_cast<Win32InputManager*>(mCreator)->getWindowHandle();
 
-	if(FAILED(mMouse->SetCooperativeLevel(mHwnd, coopSetting)))
-		OIS_EXCEPT(E_General, "Win32Mouse::Win32Mouse >> Failed to set coop level");
+	if (!mSkipCoopLevels)
+	{
+		if (FAILED(mMouse->SetCooperativeLevel(mHwnd, coopSetting)))
+			OIS_EXCEPT(E_General, "Win32Mouse::Win32Mouse >> Failed to set coop level");
+	}
 
 	if(FAILED(mMouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph)))
 		OIS_EXCEPT(E_General, "Win32Mouse::Win32Mouse >> Failed to set property");

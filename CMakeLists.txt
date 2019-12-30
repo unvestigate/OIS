@@ -1,4 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
+
+# Added for Basis.
+if(WIN32)
+    #https://stackoverflow.com/questions/45692367/how-to-set-msvc-target-platform-version-with-cmake
+    set(CMAKE_SYSTEM_VERSION 8.1 CACHE TYPE INTERNAL FORCE)
+    #set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 8.1 CACHE TYPE INTERNAL FORCE)
+elseif(APPLE)
+    set(CMAKE_OSX_ARCHITECTURES x86_64 CACHE TYPE INTERNAL FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14 CACHE TYPE INTERNAL FORCE)
+elseif(LINUX)
+    #Anything to do?
+endif()
+
 project(OIS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CmakeModules)

@@ -44,7 +44,7 @@ namespace OIS
 		@param coopSettings
 			A combination of DI Flags (see DX Help for info on input device settings)
 		*/
-		Win32Keyboard(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings);
+		Win32Keyboard(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings, bool skipCoopLevels);
 		virtual ~Win32Keyboard();
 
 		/** @copydoc Keyboard::isKeyDown */
@@ -96,6 +96,9 @@ namespace OIS
 
 		//! used for getAsString
 		std::string mGetString;
+
+		//! Added for Basis. Allows the user to skip setting coop levels for this device.
+		bool mSkipCoopLevels;
 	};
 }
 #endif //_WIN32_KEYBOARD_H_EADER_

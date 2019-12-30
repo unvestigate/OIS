@@ -90,7 +90,7 @@ namespace OIS
 	class _OISExport MultiTouchEvent : public EventArg
 	{
 	public:
-		MultiTouchEvent(Object* obj, const MultiTouchState& ms) :
+		MultiTouchEvent(const Object* obj, const MultiTouchState& ms) :
 		 EventArg(obj), state(ms) {}
 		virtual ~MultiTouchEvent() {}
 

@@ -32,12 +32,13 @@ following restrictions:
 using namespace OIS;
 
 //--------------------------------------------------------------------------------------------------//
-Win32Keyboard::Win32Keyboard(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings) :
+Win32Keyboard::Win32Keyboard(InputManager* creator, IDirectInput8* pDI, bool buffered, DWORD coopSettings, bool skipCoopLevels) :
  Keyboard(creator->inputSystemName(), buffered, 0, creator)
 {
 	mKeyboard	= nullptr;
 	mDirectInput = pDI;
 	coopSetting  = coopSettings;
+	mSkipCoopLevels = skipCoopLevels;
 
 	//Clear our keyboard state buffer
 	memset(&KeyBuffer, 0, 256);
@@ -57,10 +58,13 @@ void Win32Keyboard::_initialize()
 	if(FAILED(mKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 		OIS_EXCEPT(E_General, "Win32Keyboard::Win32Keyboard >> format error!");
 
-	const HWND hwin = static_cast<Win32InputManager*>(mCreator)->getWindowHandle();
+	if (!mSkipCoopLevels)
+	{
+		const HWND hwin = static_cast<Win32InputManager*>(mCreator)->getWindowHandle();
 
-	if(FAILED(mKeyboard->SetCooperativeLevel(hwin, coopSetting)))
-		OIS_EXCEPT(E_General, "Win32Keyboard::Win32Keyboard >> coop error!");
+		if(FAILED(mKeyboard->SetCooperativeLevel(hwin, coopSetting)))
+			OIS_EXCEPT(E_General, "Win32Keyboard::Win32Keyboard >> coop error!");
+	}
 
 	if(mBuffered)
 	{

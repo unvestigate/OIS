@@ -186,7 +186,7 @@ namespace OIS
 	class _OISExport KeyEvent : public EventArg
 	{
 	public:
-		KeyEvent(Object* obj, KeyCode kc, unsigned int txt) :
+		KeyEvent(const Object* obj, KeyCode kc, unsigned int txt) :
 		 EventArg(obj), key(kc), text(txt) {}
 		virtual ~KeyEvent() {}
 

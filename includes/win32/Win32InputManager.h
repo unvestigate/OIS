@@ -111,6 +111,9 @@ namespace OIS
 
 		//! Used to know if we used up mouse
 		bool mouseUsed;
+
+		//! Added for Basis. Allows the user to skip setting coop levels for the devices created by this manager.
+		bool mSkipCoopLevels;
 	};
 }
 #endif
