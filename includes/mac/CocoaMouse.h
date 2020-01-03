@@ -40,7 +40,7 @@ namespace OIS
 	class CocoaMouse : public Mouse
 	{
 	public:
-		CocoaMouse(InputManager* creator, bool buffered);
+		CocoaMouse(InputManager* creator, bool buffered, bool hideCursor);
 		virtual ~CocoaMouse();
 
 		/** @copydoc Object::setBuffered */
@@ -55,10 +55,13 @@ namespace OIS
 		/** @copydoc Object::_initialize */
 		virtual void _initialize();
 
+		virtual void clearState();
+
 		MouseState* getMouseStatePtr() { return &(mState); }
 
 	protected:
 		CocoaMouseView* mResponder;
+		bool mHideCursor;
 	};
 }
 
@@ -67,10 +70,13 @@ namespace OIS
 	MouseState mTempState;
 	bool mNeedsToRegainFocus;
 	bool mMouseWarped;
+	bool mHideCursor;
 }
 
+- (id)initWithFrame:(NSRect)frame hideCursor:(bool)hideCursor;
 - (void)setOISMouseObj:(CocoaMouse*)obj;
 - (void)capture;
+- (void)clearState;
 
 @end
 

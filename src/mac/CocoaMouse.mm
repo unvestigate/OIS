@@ -32,13 +32,13 @@ following restrictions:
 using namespace OIS;
 
 //-------------------------------------------------------------------//
-CocoaMouse::CocoaMouse(InputManager* creator, bool buffered) :
- Mouse(creator->inputSystemName(), buffered, 0, creator)
+CocoaMouse::CocoaMouse(InputManager* creator, bool buffered, bool hideCursor) :
+ Mouse(creator->inputSystemName(), buffered, 0, creator), mHideCursor(hideCursor)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
 	CocoaInputManager* man = static_cast<CocoaInputManager*>(mCreator);
-	mResponder			   = [[CocoaMouseView alloc] initWithFrame:[[man->_getWindow() contentView] frame]];
+	mResponder			   = [[CocoaMouseView alloc] initWithFrame:[[man->_getWindow() contentView] frame] hideCursor:mHideCursor];
 	if(!mResponder)
 		OIS_EXCEPT(E_General, "CocoaMouseView::CocoaMouseView >> Error creating event responder");
 
@@ -52,9 +52,12 @@ CocoaMouse::CocoaMouse(InputManager* creator, bool buffered) :
 
 CocoaMouse::~CocoaMouse()
 {
-	// Restore Mouse
-	// CGAssociateMouseAndMouseCursorPosition(true);
-	CGDisplayShowCursor(kCGDirectMainDisplay);
+	if (mHideCursor)
+	{
+		// Restore Mouse
+		// CGAssociateMouseAndMouseCursorPosition(true);
+		CGDisplayShowCursor(kCGDirectMainDisplay);
+	}
 
 	if(mResponder)
 	{
@@ -68,7 +71,18 @@ CocoaMouse::~CocoaMouse()
 void CocoaMouse::_initialize()
 {
 	mState.clear();
-	CGAssociateMouseAndMouseCursorPosition(false);
+	if (mHideCursor)
+	{
+		CGAssociateMouseAndMouseCursorPosition(false);
+	}
+}
+
+void CocoaMouse::clearState()
+{
+    if (mResponder)
+    {
+        [mResponder clearState];
+    }
 }
 
 void CocoaMouse::setBuffered(bool buffered)
@@ -83,25 +97,29 @@ void CocoaMouse::capture()
 
 @implementation CocoaMouseView
 
-- (id)initWithFrame:(NSRect)frame
+- (id)initWithFrame:(NSRect)frame hideCursor:(bool)hideCursor
 {
 	self = [super initWithFrame:frame];
 	if(self) {
+		mHideCursor = hideCursor;
 		mTempState.clear();
 		mMouseWarped		= false;
 		mNeedsToRegainFocus = false;
 
-		// Hide OS Mouse
-		CGDisplayHideCursor(kCGDirectMainDisplay);
+		if (mHideCursor)
+		{
+			// Hide OS Mouse
+			CGDisplayHideCursor(kCGDirectMainDisplay);
 
-		NSRect clipRect = NSMakeRect(0.0f, 0.0f, 0.0f, 0.0f);
-		clipRect		= [[[self window] contentView] frame];
-
-		CGPoint warpPoint;
-		warpPoint.x = (((frame.origin.x + frame.size.width) - frame.origin.x) / 2) + frame.origin.x;
-		warpPoint.y = (((frame.origin.y + frame.size.height) - frame.origin.y) / 2) - frame.origin.y;
-		//        warpPoint = CGPointMake(clipRect.size.height, clipRect.size.width);
-		CGDisplayMoveCursorToPoint(kCGDirectMainDisplay, warpPoint);
+			NSRect clipRect = NSMakeRect(0.0f, 0.0f, 0.0f, 0.0f);
+			clipRect		= [[[self window] contentView] frame];
+		
+			CGPoint warpPoint;
+			warpPoint.x = (((frame.origin.x + frame.size.width) - frame.origin.x) / 2) + frame.origin.x;
+			warpPoint.y = (((frame.origin.y + frame.size.height) - frame.origin.y) / 2) - frame.origin.y;
+			//        warpPoint = CGPointMake(clipRect.size.height, clipRect.size.width);
+			CGDisplayMoveCursorToPoint(kCGDirectMainDisplay, warpPoint);
+		}
 
 		// Use NSTrackingArea to track mouse move events
 		NSTrackingAreaOptions trackingOptions = NSTrackingMouseMoved | NSTrackingEnabledDuringMouseDrag | NSTrackingMouseEnteredAndExited | NSTrackingActiveInActiveApp;
@@ -168,6 +186,20 @@ void CocoaMouse::capture()
 	}
 
 	mTempState.clear();
+}
+
+- (void)clearState
+{
+    NSPoint pos  = [[self window] mouseLocationOutsideOfEventStream];
+    NSRect frame = [[[self window] contentView] frame];
+
+    // Clear the previous mouse state
+    MouseState* state = oisMouseObj->getMouseStatePtr();
+    state->clear();
+
+    // Cocoa's coordinate system has the origin in the bottom left so we need to transform the height
+    mTempState.X.rel = pos.x;
+    mTempState.Y.rel = frame.size.height - pos.y;
 }
 
 #pragma mark Left Mouse Event overrides
@@ -361,8 +393,12 @@ void CocoaMouse::capture()
 
 - (void)mouseEntered:(NSEvent*)theEvent
 {
-	CGDisplayHideCursor(kCGDirectMainDisplay);
-	CGAssociateMouseAndMouseCursorPosition(false);
+    if (mHideCursor)
+    {
+		CGDisplayHideCursor(kCGDirectMainDisplay);
+		CGAssociateMouseAndMouseCursorPosition(false);
+	}
+    
 	if(!mMouseWarped)
 	{
 		NSPoint pos  = [[self window] mouseLocationOutsideOfEventStream];
@@ -380,8 +416,11 @@ void CocoaMouse::capture()
 
 - (void)mouseExited:(NSEvent*)theEvent
 {
-	CGDisplayShowCursor(kCGDirectMainDisplay);
-	CGAssociateMouseAndMouseCursorPosition(true);
+    if (mHideCursor)
+    {
+		CGDisplayShowCursor(kCGDirectMainDisplay);
+		CGAssociateMouseAndMouseCursorPosition(true);
+	}
 }
 
 @end

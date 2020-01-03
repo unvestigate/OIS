@@ -96,6 +96,8 @@ namespace OIS
 
 		//! HID Manager class handling devices other than keyboard/mouse
 		MacHIDManager* mHIDManager;
+
+		bool mHideMouseCursor;
 	};
 }
 #endif

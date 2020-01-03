@@ -139,6 +139,11 @@ namespace OIS
 		/** @remarks Returns the state of the mouse - is valid for both buffered and non buffered mode */
 		const MouseState& getMouseState() const { return mState; }
 
+		// Added for Basis. Allows clearing the internal state.
+		// Useful when we need to "start again", eg. after entering
+		// the window.
+		virtual void clearState() { }
+
 	protected:
 		Mouse(const std::string& vendor, bool buffered, int devID, InputManager* creator) :
 		 Object(vendor, OISMouse, buffered, devID, creator), mListener(0) {}

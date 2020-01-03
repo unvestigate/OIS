@@ -47,6 +47,9 @@ CocoaInputManager::CocoaInputManager() :
 	mFactories.push_back(this);
 
 	mHIDManager = new MacHIDManager();
+
+	mHideMouseCursor = true;
+
 	mFactories.push_back(mHIDManager);
 }
 
@@ -98,6 +101,13 @@ void CocoaInputManager::_parseConfigSettings(ParamList& paramList)
 		{
 			mUseRepeat = true;
 		}
+	}
+
+	// Added for Basis. Allow disabling the hiding of the Cocoa mouse cursor which is on by default.
+	ParamList::iterator hideCursorIt = paramList.find("COCOA_HIDE_CURSOR");
+	if (hideCursorIt != paramList.end())
+	{
+		mHideMouseCursor = hideCursorIt->second == "true";
 	}
 }
 
@@ -167,7 +177,7 @@ Object* CocoaInputManager::createObject(InputManager* creator, Type iType, bool 
 		case OISMouse:
 		{
 			if(mouseUsed == false)
-				obj = new CocoaMouse(this, bufferMode);
+				obj = new CocoaMouse(this, bufferMode, mHideMouseCursor);
 			break;
 		}
 		default:
